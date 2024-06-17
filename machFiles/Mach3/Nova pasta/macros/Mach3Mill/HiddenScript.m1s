@@ -1,0 +1,1 @@
+deactivatesignal(output4)SetUserLed(1101,1)SetUserLed(1102,0)SetUserLed(1103,0)SetUserLed(1104,0)SetOemDro(56,1)msgbox" Selecione a RPM"

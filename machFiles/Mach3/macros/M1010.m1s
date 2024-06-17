@@ -1,0 +1,369 @@
+Type Position
+	x As Double
+	y As Double
+End Type
+
+
+
+Dim actualPosition As Position
+Dim safeZ As Double
+
+Sub Main()
+
+		
+	Dim centerLaser As Position
+	Dim centerCam As Position
+	Dim centerSeal As Position
+
+
+	centerLaser.x = -126
+	centerLaser.y = +19.5
+	
+	centerCam.x = -81
+	centerCam.y = 19.5
+	
+	centerSeal.x = 15
+	centerSeal.y = -105
+	
+	
+	Dim holeHeight As Double
+	
+	holeHeight = 5
+
+	Dim zBeforeHole As Double
+	
+	zBeforeHole = -5
+	
+	Dim deltaSpindleSeal As Double
+	
+	deltaSpindleSeal = 40	
+	
+	safeZ = 10
+
+	
+
+
+	
+	Dim delta As Position
+	
+	
+	'MsgBox("Iniciando Processo!\nDigite OK para continuar")
+	
+	
+	
+	' Activate sensor for Homing
+	activateSignal(output3)
+	
+	code("M1003")
+	sleep(500)
+	
+	doButton(1024) ' Home Z
+	
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	code("G90 G54 G92 Z0")  ' Zero Z
+	
+	
+	
+	actualPosition.x = GetABSPosition(0)
+	actualPosition.y = GetABSPosition(1)
+	actualPosition.z = GetABSPosition(2)
+	
+	'MsgBox("Ativando Magazine")
+	
+	Call activateMagazine
+	
+	sleep(1000)
+	'MsgBox("Desativando magazine")
+
+	Call deactivateMagazine
+	
+
+	
+	Call subtract(centerSeal,centerLaser,delta) ' delta = centerSeal - centerLaser
+
+	'MsgBox("Vedacao Para Laser")
+	Call moveBy(delta.x, delta.y, 0)
+	
+	'MsgBox("Ativando vedacao")
+	Call activateSeal
+	
+	
+
+	'MsgBox("sobe ate chegar no carro")
+	'movimenta até sensor
+	
+	activateSignal(output3)
+	code("m1003")
+	sleep(500)
+
+	code("G54 G31 z21 f500")
+	
+	While isMoving()
+		sleep(100)
+	Wend
+
+	
+	deactivateSignal(output3)
+	
+
+	code("G90 G54 G92 Z-" & deltaSpindleSeal)  ' Zero Z
+
+
+	actualPosition.x = GetABSPosition(0)
+	actualPosition.y = GetABSPosition(1)
+	actualPosition.z = GetABSPosition(2)
+		
+	
+	
+	'MsgBox("desativa vedacao")
+	
+	Call deactivateSeal()
+	
+	
+	'MsgBox("vai para o Z seguro")
+	Call moveToSafeZ()
+	
+	
+	'MsgBox("move spindle para laser")
+	Call zera(delta)
+	
+	Call subtract(delta,centerSeal,delta)	
+
+	Call moveBy(delta.x,delta.y,0)
+	
+	
+	
+	
+	'MsgBox("ativa succao e spindle")
+	
+	'Call activateSuction()
+	
+	'DoSpinCw()
+	
+	
+
+
+
+	' SOBE Até CARRO
+	code("M1003")
+	sleep(500)
+	code("G90 G54 G1 z" & zBeforeHole & " F500")
+	While isMoving()
+		sleep(100)
+	Wend
+
+	
+	
+	
+	' ENCOSTA SPINDLE NO CARRO
+
+	code("G90 G54 G1 z0 F500")
+	While isMoving()
+		sleep(100)
+	Wend
+		
+	
+	' FURA O CARRO
+
+	code("G90 G54 G1 z" & holeHeight & " F500")
+	While isMoving()
+		sleep(100)
+	Wend	
+		
+	' DESCE  ATÉANTES DO CARRO
+
+	code("G90 G54 G1 z" & zBeforeHole & " F500")
+	While isMoving()
+		sleep(100)
+	Wend	
+		
+			
+	sleep(3000)
+	' ESPERA Todo o residuo sair
+	
+	
+	
+	'MsgBox("desliga o spindle e a succao")
+	'DoSpinStop()
+	Call deactivateSuction()
+	
+	
+	
+	'MsgBox("vai para o Z seguro")
+	Call moveToSafeZ()
+
+	
+	'MsgBox("ativa magazine")
+	
+	Call activateMagazine()
+	
+	sleep(2000)
+	
+	'MsgBox("desativa magazine")
+	Call deactivateMagazine()
+	
+
+	
+	'MsgBox("move vedacao para spindle")
+	Call moveBy(centerSeal.x,centerSeal.y, 0)
+	
+	'MsgBox("ativa vedacao")
+	
+	Call activateSeal()
+	
+	
+
+	
+	'MsgBox("mova vedacao ate o buraco")
+	'Call move(delta)
+	code("M1003")
+	sleep(500)
+	code("G90 G54 G1 z-" & deltaSpindleSeal & "F500")
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	'MsgBox("Desativa Vedacao")
+	Call deactivateSeal()
+	
+
+	'MsgBox("move para o z de seguranca")
+	Call moveToSafeZ()
+
+	
+	
+	
+	Call subtract(centerCam,centerSeal,delta)
+	
+	'MsgBox("move camera para laser")
+	
+	Call moveBy(delta.x,delta.y, 0)
+	
+		
+
+End Sub
+
+
+Sub add(ByRef pointA As Position,ByRef pointB As Position,ByRef result As Position)
+	result.x = pointA.x + pointB.x
+	result.y = pointA.y + pointB.y
+	result.z = pointA.z + pointB.z
+End Sub
+
+Sub subtract(ByRef pointA As Position,ByRef pointB As Position,ByRef result As Position)
+	result.x = pointA.x - pointB.x
+	result.y = pointA.y - pointB.y
+	result.z = pointA.z - pointB.z
+End Sub
+
+Sub activateMagazine()
+	ActivateSignal(output4)
+End Sub
+
+Sub deactivateMagazine()
+	DeactivateSignal(output4)
+End Sub
+
+
+Sub activateSeal() 
+	ActivateSignal(output6)
+End Sub
+Sub deactivateSeal()
+	DeactivateSignal(output6)
+End Sub
+
+Sub activateSuction() 
+	ActivateSignal(output5)
+End Sub
+Sub deactivateSuction()
+	DeactivateSignal(output5)
+End Sub
+
+
+Sub zera(ByRef point As Position)
+	point.x = 0
+	point.y = 0
+	point.z = 0
+
+End Sub
+
+
+
+Sub moveBy(dX As Double, dY As Double, dZ As Double)	
+	code("m1001")
+	sleep(500)
+	code("G91 g0 x" & dX)
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	code("m1002")
+	sleep(500)
+	code("G91 G0 y" & dY)
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	code("m1003")
+	sleep(500)
+	code("G91 G0 z" & dZ)
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	actualPosition.x = GetABSPosition(0)
+	actualPosition.y = GetABSPosition(1)
+	actualPosition.z = GetABSPosition(2)
+End Sub 
+
+Sub moveTo(dX As Double, dY As Double, dZ As Double)
+	code("m1001")
+	sleep(500)
+	code("G90 g54 g0 x" & dX)
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	code("m1002")
+	sleep(500)
+	code("G90 G54 g0 y" & dY)
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	code("m1003")
+	sleep(500)
+	code("G90 G54 G0 z" & dZ)
+	While isMoving()
+		sleep(100)
+	Wend
+	
+	actualPosition.x = GetABSPosition(0)
+	actualPosition.y = GetABSPosition(1)
+	actualPosition.z = GetABSPosition(2)
+
+
+End Sub
+
+
+Sub moveToSafeZ()
+	code("m1003")
+	sleep(500)
+	code("g90 g53 g0 z" & safeZ)
+	While isMoving()
+		sleep(100)
+	Wend
+	actualPosition.z =  GetABSPosition(2)
+End Sub
+
+
+
+
+
+
+
+
+             

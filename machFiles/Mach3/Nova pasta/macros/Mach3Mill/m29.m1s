@@ -1,0 +1,125 @@
+Sub Main()
+	While isactivatesignal(inptu1)=true Then
+		MsgBox "Sensor de Referencia Acionado , Corrriga o Erro para Continuar"
+		Exit Sub
+	Wend
+
+	Call referencia()
+	If isactivatesignal(input1)=true Then
+		Exit Sub
+	End If
+
+ 
+
+	referencia
+	If isactivatesignal(input1)=true Then
+		Exit Sub
+	End If
+
+	referencia
+	If isactivatesignal(input1)=true Then
+		Exit Sub
+	End If
+	
+	dooembutton(2) 
+End Sub
+
+
+Sub referencia()
+
+
+	DoButton( 24)
+
+	While IsMoving()
+
+	Wend
+
+	code"g53 g1 z-5 f500"
+
+	While IsMoving()
+ 
+	Wend
+ 
+
+	If isactivatesignal(inptu1)=true Then
+		MsgBox" Sensor de Referencia Acionado , Pressione Ok que a Maquina Tentar� Corrigir o Problema"
+		code"g53 g1 z-10 f500"
+		
+While IsMoving()
+
+		Wend
+		
+		If isactivatesignal(inptu1)=true Then
+			MsgBox" Sensor de Referencia Acionado , Corrriga o Erro para Continuar"
+			Exit Sub
+		End If
+	End If
+
+
+	
+
+	
+
+DoButton( 22 )
+
+	While IsMoving()
+
+	Wend
+
+	code"g53 g1 x5 f500"
+
+	While IsMoving()
+ 
+	Wend
+ 
+ 
+
+	If isactivatesignal(inptu1)=true Then
+		MsgBox" Sensor de Referencia Acionado , Pressione Ok que a Maquina Tentar� Corrigir o Problema"
+		code"g53 g1 x10 f500"
+		
+While IsMoving()
+
+		Wend
+		
+		If isactivatesignal(inptu1)=true Then
+			MsgBox" Sensor de Referencia Acionado , Corrriga o Erro para Continuar"
+			Exit Sub
+		End If
+	End If
+
+
+
+
+	
+DoButton( 23 )
+
+	While IsMoving()
+
+	Wend
+	
+
+	code"g53 g1 y-5 f500"
+
+	While IsMoving()
+ 
+	Wend
+ 
+ 
+	
+
+	If isactivatesignal(inptu1)=true Then
+		MsgBox" Sensor de Referencia Acionado , Pressione Ok que a Maquina Tentar� Corrigir o Problema"
+		code"g53 g1 y-10 f500"
+		
+While IsMoving()
+
+		Wend
+		
+		If isactivatesignal(inptu1)=true Then
+			MsgBox" Sensor de Referencia Acionado , Corrriga o Erro para Continuar"
+			Exit Sub
+		End If
+	End If
+
+End Sub 
